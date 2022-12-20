@@ -1,0 +1,25 @@
+<div class="nav_bar">
+    <ul class="nav nav-pills nav-justified" *ngFor="let item of users">
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/groupChat',item.id]" routerLinkActive="active"
+                ariaCurrentWhenActive="page">Group Chat</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/userManagement',item.id]" routerLinkActive="active"
+                ariaCurrentWhenActive="page">Manage Users</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/docsManagemetn',item.id]" routerLinkActive="active"
+                ariaCurrentWhenActive="page">Manage Documents</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/logout',item.id]" routerLinkActive="active"
+                ariaCurrentWhenActive="page">Logout</a>
+        </li>
+
+    </ul>
+
+</div>

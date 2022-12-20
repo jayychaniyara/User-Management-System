@@ -1,0 +1,350 @@
+///////////////////////////////////////
+doc management -TS
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { IUploadDocument } from '../iupload-document';
+
+@Component({
+  selector: 'app-docs-management',
+  templateUrl: './docs-management.component.html',
+  styleUrls: ['./docs-management.component.scss']
+})
+export class DocsManagementComponent implements OnInit {
+
+  uploadForm!: FormGroup;
+  getItemFromLocalStorage: any;
+  userUploadDocument: any;
+
+  user: IUploadDocument[] = [];
+
+  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
+    this.uploadForm = this.fb.group({
+      id: new FormControl(''),
+      fileDescription: new FormControl(''),
+      fileUpload: new FormControl('')
+    })
+  }
+
+  ngOnInit(): void {
+    // Accessing stored value in html page
+    const userUploadData = localStorage.getItem('uploadDocumentStorage');
+    this.user = userUploadData != null ? JSON.parse(userUploadData) : [];
+  }
+  uploadFile() {
+    // Getting current user id
+    const currentUserID = Number(this.route.snapshot.paramMap.get('id'));
+
+    ///test
+
+    let fileNameUpload = (document.getElementById("chooseFile") as HTMLInputElement).value;
+    fileNameUpload = fileNameUpload.substring(12);
+
+    ////
+
+    // Creating new object to store in Upload Docs storage
+    const uploadDocumentList: IUploadDocument = {
+      uploadId: Number(new Date()),
+      id: currentUserID,
+      'fileDescription': this.uploadForm.value.fileDescription,
+      'fileUpload': fileNameUpload,
+    };
+
+    // Pushing object into Upload Docs storage
+    this.getItemFromLocalStorage = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+    this.userUploadDocument = this.getItemFromLocalStorage ? this.getItemFromLocalStorage : []; // ternary operator
+    this.userUploadDocument.push(uploadDocumentList);
+    localStorage.setItem("uploadDocumentStorage", JSON.stringify(this.userUploadDocument));
+    this.ngOnInit();
+  }
+
+  deleteFile() {
+    // Getting Upload id from URL
+    const userUploadDocsID = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Accessing the storage
+    const allStoredUsers = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+
+    // Finding index of perticular ID 
+    const deleteUserDocsIndex = allStoredUsers.findIndex((x: any) => x.uploadId == userUploadDocsID);
+
+    // Deleting array of selected user and updating local storage 
+    allStoredUsers.splice(deleteUserDocsIndex, 1);
+    localStorage.setItem('uploadDocumentStorage', JSON.stringify(allStoredUsers));
+    this.ngOnInit();
+  }
+
+  editFile() {
+    // Getting Upload id from URL
+    const userUploadDocsID = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Accessing the storage 
+    const allStoredUsers = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+
+    // Getting new value from HTML side
+    const newDescription = (document.getElementById("newFileDescription") as HTMLInputElement).value;
+
+    // Finding index of perticular ID 
+    const editUserDocsIndex = allStoredUsers.findIndex((x: any) => x.uploadId == userUploadDocsID);
+
+    // Finding Object in Array of object via Index 
+    const currentUserUploadInfo = allStoredUsers[editUserDocsIndex];
+
+    // Updating Array of object with single object value
+    currentUserUploadInfo.fileDescription = newDescription;
+    allStoredUsers.currentUserUploadInfo;
+
+    // Updating local storage 
+    localStorage.setItem("uploadDocumentStorage", JSON.stringify(allStoredUsers));
+    this.ngOnInit();
+  }
+}
+
+
+///////////////////////////////////////
+doc management -HTML
+
+<app-nav-bar></app-nav-bar>
+
+<!-- My Uploads -->
+<div>
+    <div class="p-3 fs-4 font-weight-bold"><b>My Uploads</b></div>
+    <div class="">
+        <table class="table table-bordered table-striped border-dark table-hover rounded">
+            <thead>
+                <tr>
+                    <th class="col-lg-4">Label</th>
+                    <th class="col-lg-4 text-center">File Name</th>
+                    <th class="col-lg-2 text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of user">
+                    <td class="col-lg-4">{{item.fileDescription}}</td>
+                    <td class="col-lg-4 text-center">{{item.fileUpload}}</td>
+                    <td class="col-lg-2 text-center">
+                        <button type="button" class="testbtn text-primary" data-bs-toggle="modal"
+                            data-bs-target="#editModal" [routerLink]="['/docsManagemetn',item.uploadId]"><u>Edit</u>
+                        </button>
+                        &nbsp;|&nbsp;
+                        <button type="button" class="testbtn text-primary" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            [routerLink]="['/docsManagemetn',item.uploadId]"><u>Delete</u></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Uploads -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">+ Add Upload</button>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="editText">
+                    <h5 class="modal-title">Edit</h5>
+                </div>
+                <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body row">
+                <div class="col-4">File Description</div>
+                <div class="col-8">
+                    <input type="text" class="form-control border border-dark" id="newFileDescription">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center p-4 row">
+                <div class="col-4"></div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-secondary col-md-8" (click)="editFile()">Ok</button>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-secondary col-md-8" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm File Deletion?</h5>
+                <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <i class="fa fa-question-circle fa-lg p-1" aria-hidden="true"></i>
+                Are You Sure?
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-primary" (click)='deleteFile()'>Ok</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<form [formGroup]="uploadForm">
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <h5 class="modal-title">Upload</h5>
+
+                    <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-4"><b>File Description</b></div>
+                    <div class="col-8">
+                        <input type="text" formControlName="fileDescription" class="form-control border border-dark"
+                            id="recipient-name">
+                    </div>
+                </div>
+                <div class="p-4 row">
+                    <div class="col-4"><b>File Upload</b></div>
+                    <div class="col-4">
+                        <!-- <button type="button" class="btn btn-secondary col-lg">Choose File</button> -->
+                        <input type="file" id="chooseFile" formControlName="fileUpload">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center p-4 row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-11" (click)="uploadFile()">Upload
+                            Now</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-11"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+///////////////////////////////docs Managemetn TS/////////////////////////////
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { IUploadDocument } from '../iupload-document';
+
+@Component({
+  selector: 'app-docs-management',
+  templateUrl: './docs-management.component.html',
+  styleUrls: ['./docs-management.component.scss']
+})
+export class DocsManagementComponent implements OnInit {
+
+  uploadForm!: FormGroup;
+  getItemFromLocalStorage: any;
+  userUploadDocument: any;
+
+  user: IUploadDocument[] = [];
+  
+
+  constructor(private route: ActivatedRoute, private fb: FormBuilder) {
+    this.uploadForm = this.fb.group({
+      id: new FormControl(''),
+      fileDescription: new FormControl(''),
+      fileUpload: new FormControl('')
+    })
+  }
+
+  ngOnInit(): void {
+    const userUploadDocsID = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Accessing the storage
+    const allStoredUsers = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+
+    // Filtering the documents of perticular user
+    const userUploads = allStoredUsers.filter((x: any) => x.id == userUploadDocsID);
+    const userUploadsList = JSON.stringify(userUploads);
+
+    // Accessing stored value in html page
+    const userUploadData = localStorage.getItem('uploadDocumentStorage');
+    this.user = userUploadData != null ? JSON.parse(userUploadsList) : [];
+
+  }
+  uploadFile() {
+    // Getting current user id
+    const currentUserID = Number(this.route.snapshot.paramMap.get('id'));
+
+    ///test
+
+    let fileNameUpload = (document.getElementById("chooseFile") as HTMLInputElement).value;
+    fileNameUpload = fileNameUpload.substring(12);
+
+    ////
+
+    // Creating new object to store in Upload Docs storage
+    const uploadDocumentList: IUploadDocument = {
+      uploadId: Number(new Date()),
+      id: currentUserID,
+      'fileDescription': this.uploadForm.value.fileDescription,
+      'fileUpload': fileNameUpload,
+    };
+
+    // Pushing object into Upload Docs storage
+    this.getItemFromLocalStorage = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+    this.userUploadDocument = this.getItemFromLocalStorage ? this.getItemFromLocalStorage : []; // ternary operator
+    this.userUploadDocument.push(uploadDocumentList);
+    localStorage.setItem("uploadDocumentStorage", JSON.stringify(this.userUploadDocument));
+    this.ngOnInit();
+  }
+
+  deleteFile() {
+    // Getting Upload id from URL
+    const userUploadDocsID = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Accessing the storage
+    const allStoredUsers = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+
+    // Finding index of perticular ID 
+    const deleteUserDocsIndex = allStoredUsers.findIndex((x: any) => x.uploadId == userUploadDocsID);
+
+    // Deleting array of selected user and updating local storage 
+    allStoredUsers.splice(deleteUserDocsIndex, 1);
+    localStorage.setItem('uploadDocumentStorage', JSON.stringify(allStoredUsers));
+    this.ngOnInit();
+  }
+
+  editFile() {
+    // Getting Upload id from URL
+    const userUploadDocsID = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Accessing the storage 
+    const allStoredUsers = JSON.parse(localStorage.getItem('uploadDocumentStorage')!);
+
+    // Getting new value from HTML side
+    const newDescription = (document.getElementById("newFileDescription") as HTMLInputElement).value;
+
+    // Finding index of perticular ID 
+    const editUserDocsIndex = allStoredUsers.findIndex((x: any) => x.uploadId == this.userUploadDocument.id);
+
+    // Finding Object in Array of object via Index 
+    const currentUserUploadInfo = allStoredUsers[editUserDocsIndex];
+
+    // Updating Array of object with single object value
+    currentUserUploadInfo.fileDescription = newDescription;
+    allStoredUsers.currentUserUploadInfo;
+
+    // Updating local storage 
+    localStorage.setItem("uploadDocumentStorage", JSON.stringify(allStoredUsers));
+    this.ngOnInit();
+  }
+}

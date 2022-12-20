@@ -1,0 +1,31 @@
+<app-nav-bar></app-nav-bar>
+
+<!-- Group Chat -->
+<div class="p-3"></div>
+<div class="mainChat">
+    Group Chat
+    <button type="button" class="btn-close btntest1 " aria-label="Close"></button>
+</div>
+
+<!-- Chatbox Container -->
+<div class="chatBox" id="chatDiv">
+    <div *ngFor="let item of user">
+        [{{item.TimeStamp | date:'yyyy-MM-dd HH:mm:ss'}}] {{item.userName}} : {{item.message}}
+    </div>
+</div>
+
+<!-- Chatbox Footer -->
+<form [formGroup]="groupChatForm">
+    <div class="chatBoxFooter">
+
+        <span> {{chatUserName}} &nbsp;</span>
+
+        <input type="text" id="newFullName" class="form-control chatText" formControlName="message">
+
+        <button type="button" class="btn btn-light rounded chatButton" (click)="send()"
+            [disabled]="!groupChatForm.valid">Send</button>&nbsp;&nbsp;
+        <button type="button" class="btn btn-light rounded chatButton"
+            onClick="window.location.reload()">Refresh</button>
+
+    </div>
+</form>

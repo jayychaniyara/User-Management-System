@@ -1,0 +1,52 @@
+<app-nav-bar></app-nav-bar>
+
+<!-- User table -->
+<div>
+    <div class="p-3 fs-4 font-weight-bold"><b>Users</b></div>
+    <div class="">
+        <table class="table table-bordered table-striped border-dark table-hover rounded">
+            <thead>
+                <tr>
+                    <th class="col-lg-4">Name</th>
+                    <th class="col-lg-4 text-center ">User Email ID</th>
+                    <th class="col-lg-2 "></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of user">
+                    <td class="col-lg-4">{{item.fullName}}</td>
+                    <td class="col-lg-4 text-center">{{item.email}}</td>
+                    <td class="col-lg-2 text-center"><a
+                            [routerLink]="['/editUser',item.id]">Edit</a>&nbsp;|&nbsp;<button type="button"
+                            class="testbtn text-primary" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            [disabled]="_id === item.id? true:false"
+                            [routerLink]="['/userManagement',item.id]"><u>Delete</u></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Delete Modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm User Deletion?</h5>
+                <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <i class="fa fa-question-circle fa-lg p-1" aria-hidden="true"></i>
+                Are You Sure?
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-primary" (click)='deleteUser()'
+                    data-bs-dismiss="modal">Ok</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

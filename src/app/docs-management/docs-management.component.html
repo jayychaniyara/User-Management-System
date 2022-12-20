@@ -1,0 +1,152 @@
+<app-nav-bar> </app-nav-bar>
+
+<!-- My Uploads -->
+<div>
+    <div class="p-3 fs-4 font-weight-bold"><b>My Uploads</b></div>
+    <div class="">
+        <table class="table table-bordered table-striped border-dark table-hover rounded">
+            <thead>
+                <tr>
+                    <th class="col-lg-4">Label</th>
+                    <th class="col-lg-4 text-center">File Name</th>
+                    <th class="col-lg-2 text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of user">
+                    <td class="col-lg-4">{{item.fileDescription}}</td>
+                    <td class="col-lg-4 text-center">{{item.fileUpload}}</td>
+                    <td class="col-lg-2 text-center">
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#editModal"
+                            [routerLink]="['/docsManagemetn',item.uploadId]"><u>Edit</u>
+                        </button>
+                        &nbsp;|&nbsp;
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            [routerLink]="['/docsManagemetn',item.uploadId]"><u>Delete</u></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Uploads -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">+ Add Upload</button>
+
+<!-- Edit Modal -->
+<form [formGroup]="editDocumentForm">
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="editText">
+                        <h5 class="modal-title">Edit</h5>
+                    </div>
+                    <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-4">File Description</div>
+                    <div class="col-8">
+                        <input type="text" class="form-control border border-dark" formControlName="fileDescription"
+                            id="newFileDescription"
+                            [ngClass]="{'is-invalid': (editDocumentForm.get('fileDescription')?.touched) && !editDocumentForm.get('fileDescription')?.valid}">
+
+                        <span class="invalid-feedback">
+                            <span *ngIf="editDocumentForm.get('fileDescription')?.errors?.['required']">Please enter
+                                your
+                                File Description
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center p-4 row">
+                    <div class="col-4"></div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-8" (click)="editFile()"
+                            (click)="reloadCurrentPage()" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-8" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Delete Modal -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm File Deletion?</h5>
+                <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <i class="fa fa-question-circle fa-lg p-1" aria-hidden="true"></i>
+                Are You Sure?
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-primary" (click)='deleteFile()' data-bs-dismiss="modal"
+                    (click)="reloadCurrentPage()">Ok</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<form [formGroup]="uploadForm">
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <h5 class="modal-title">Upload</h5>
+
+                    <button type="button" class="btn-close border border-dark" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-4"><b>File Description</b></div>
+                    <div class="col-8">
+                        <input type="text" formControlName="fileDescription" class="form-control border border-dark"
+                            id="recipient-name"
+                            [ngClass]="{'is-invalid': (uploadForm.get('fileDescription')?.touched) && !uploadForm.get('fileDescription')?.valid}">
+                        <span class="invalid-feedback">
+                            <span *ngIf="uploadForm.get('fileDescription')?.errors?.['required']">Please enter your
+                                File label
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="p-4 row">
+                    <div class="col-4"><b>File Upload</b></div>
+                    <div class="col-4">
+                        <!-- <button type="button" class="btn btn-secondary col-lg">Choose File</button> -->
+                        <input type="file" id="chooseFile" formControlName="fileUpload"
+                            [ngClass]="{'is-invalid': (uploadForm.get('fileUpload')?.touched) && !uploadForm.get('fileUpload')?.valid}">
+                        <span class="invalid-feedback">
+                            <span *ngIf="uploadForm.get('fileUpload')?.errors?.['required']">Please select file</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center p-4 row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-11" (click)="uploadFile()"
+                            data-bs-dismiss="modal" [disabled]="!uploadForm.valid">Upload
+                            Now</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary col-md-11"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,83 @@
+<form [formGroup]="registerForm">
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-center display-5 font-weight-bold p-4"><b>Register</b></div>
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-2">
+                <label class="col-form-label">Full Name</label>
+            </div>
+            <div class="col-3">
+                <input type="text" class="form-control border border-dark" formControlName="fullName"
+                    [ngClass]="{'is-invalid': (registerForm.get('fullName')?.touched) && !registerForm.get('fullName')?.valid}"
+                    placeholder="Full Name (required)">
+
+                <!-- Error Messages for Empty Full Name field -->
+                <span class="invalid-feedback">
+                    <span *ngIf="registerForm.get('fullName')?.errors?.['required']">Please enter your Full Name</span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div class="row d-flex justify-content-center">
+            <div class="col-2">
+                <label class="col-form-label">Email</label>
+            </div>
+            <div class="col-3">
+                <input type="text" class="form-control border border-dark" formControlName="email"
+                    [ngClass]="{'is-invalid': (registerForm.get('email')?.touched) && !registerForm.get('email')?.valid}"
+                    placeholder="Email (required)">
+
+                <!-- Error Messages for Empty Email field -->
+                <span class="invalid-feedback">
+                    <span *ngIf="registerForm.get('email')?.errors?.['required']">Please enter your Email</span>
+                    <span *ngIf="registerForm.get('email')?.errors?.['pattern']">Please enter valid Email</span>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div class="row d-flex justify-content-center ">
+            <div class="col-2 ">
+                <label class="col-form-label ">Password</label>
+            </div>
+            <div class="col-3">
+                <input type="password" class="form-control border border-dark" formControlName="password"
+                    [ngClass]="{'is-invalid': (registerForm.get('password')?.touched) && !registerForm.get('password')?.valid}"
+                    placeholder="Password (required)">
+
+                <!-- Error Messages for Empty Password field -->
+                <span class="invalid-feedback">
+                    <span *ngIf="registerForm.get('password')?.errors?.['required']">Please enter your Password</span>
+                </span>
+
+            </div>
+        </div>
+        <br>
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-2">
+                <label class="col-form-label">Confirm Password</label>
+            </div>
+            <div class="col-3">
+                <input type="password" class="form-control border border-dark" formControlName="confirmPassword"
+                    [ngClass]="{'is-invalid': (registerForm.get('confirmPassword')?.touched) && !registerForm.get('confirmPassword')?.valid}"
+                    placeholder="Confirm Password (required)">
+
+                <span class="invalid-feedback">
+                    <!-- Error Messages for Empty confirm Password field -->
+                    <span *ngIf="f['confirmPassword'].getError('required')!=null">Please enter your confirm
+                        Password</span>
+                    <!-- Error Messages for Not match Password field -->
+                    <span *ngIf="f['confirmPassword'].getError('passwordMatch')!=null">Passwords
+                        did not match</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center p-4">
+            <button type="submit" class="btn btn-outline-dark col-sm-1" [disabled]="!registerForm.valid"
+                [routerLink]="['/registerSuccessful']" (click)='register()'>Register</button>
+        </div>
+    </div>
+
+</form>
